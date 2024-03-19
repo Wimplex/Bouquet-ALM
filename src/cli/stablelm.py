@@ -1,10 +1,16 @@
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-# model_name = "stabilityai/stablelm-2-zephyr-1_6b"
-model_name = "stabilityai/stablelm-zephyr-3b"
+model_name = "stabilityai/stablelm-2-zephyr-1_6b"
+# model_name = "stabilityai/stablelm-zephyr-3b"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda")
+
+# rand_tokens = torch.randint(0, 10000, size=[16, 256]).to("cuda")
+out = model.model.embed_tokens(torch.tensor([1], device="cuda"))
+print(out.shape)
+exit()
 
 # prompt = [{'role': 'user', 'content': "Which famous male actor played the role of Jack Dawson in Titanic?"}]
 # prompt = [{'role': 'user', 'content': "What is the name of the character played by Leonardo DiCaprio in Titanic?"}]
@@ -32,6 +38,15 @@ inputs = tokenizer.apply_chat_template(
     add_generation_prompt=True,
     return_tensors='pt'
 )
+
+inputs_other = tokenizer('<|im_start|>')
+print(inputs_other["input_ids"])
+outputs_other = tokenizer.decode(inputs_other["input_ids"])
+# outputs_other = tokenizer.decode(inputs.squeeze().tolist())
+for tok in inputs_other["input_ids"]:
+    print(tokenizer.decode([tok]))
+exit()
+
 
 tokens = model.generate(
     inputs.to(model.device),

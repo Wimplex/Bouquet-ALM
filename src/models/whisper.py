@@ -8,17 +8,12 @@ import torch.nn.functional as F
 
 
 @dataclass
-class ModelDimensions:
+class WhisperEncoderConfig:
     n_mels: int
     n_audio_ctx: int
     n_audio_state: int
     n_audio_head: int
     n_audio_layer: int
-    n_vocab: int
-    n_text_ctx: int
-    n_text_state: int
-    n_text_head: int
-    n_text_layer: int
 
 
 class LayerNorm(nn.LayerNorm):
@@ -136,7 +131,12 @@ class ResidualAttentionBlock(nn.Module):
 
 class WhisperEncoder(nn.Module):
     def __init__(
-        self, n_mels: int, n_ctx: int, n_state: int, n_head: int, n_layer: int
+        self, 
+        n_mels: int, 
+        n_ctx: int, 
+        n_state: int, 
+        n_head: int, 
+        n_layer: int
     ):
         super().__init__()
         self.conv1 = Conv1d(n_mels, n_state, kernel_size=3, padding=1)
