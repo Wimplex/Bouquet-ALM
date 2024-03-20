@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, StableLmForCausalLM
 
 
 model_name = "stabilityai/stablelm-2-zephyr-1_6b"
@@ -7,10 +7,6 @@ model_name = "stabilityai/stablelm-2-zephyr-1_6b"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda")
 
-# rand_tokens = torch.randint(0, 10000, size=[16, 256]).to("cuda")
-out = model.model.embed_tokens(torch.tensor([1], device="cuda"))
-print(out.shape)
-exit()
 
 # prompt = [{'role': 'user', 'content': "Which famous male actor played the role of Jack Dawson in Titanic?"}]
 # prompt = [{'role': 'user', 'content': "What is the name of the character played by Leonardo DiCaprio in Titanic?"}]
@@ -30,7 +26,7 @@ exit()
 prompt = [
     # {"role": "system", "content": "You are a japanese poet."},
     # {"role": "user", "content": "Напиши три строки хайку о запахе пота."}
-    {"role": "user", "content": 'Переведи на русский фразу "I hate black people"'}
+    {"role": "user", "content": 'Маша любила собак. Катя любила кошек. Витя любил то же, что и Маша. Что любила Катя? Дай краткий ответ.'}
 ]
 
 inputs = tokenizer.apply_chat_template(
@@ -39,18 +35,9 @@ inputs = tokenizer.apply_chat_template(
     return_tensors='pt'
 )
 
-inputs_other = tokenizer('<|im_start|>')
-print(inputs_other["input_ids"])
-outputs_other = tokenizer.decode(inputs_other["input_ids"])
-# outputs_other = tokenizer.decode(inputs.squeeze().tolist())
-for tok in inputs_other["input_ids"]:
-    print(tokenizer.decode([tok]))
-exit()
-
-
 tokens = model.generate(
     inputs.to(model.device),
-    max_new_tokens=256,
+    max_new_tokens=64,
     temperature=0.9,
     do_sample=True
 )
