@@ -1,19 +1,9 @@
 from typing import Optional, Iterable
-from dataclasses import dataclass
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
-@dataclass
-class WhisperEncoderConfig:
-    n_mels: int
-    n_audio_ctx: int
-    n_audio_state: int
-    n_audio_head: int
-    n_audio_layer: int
 
 
 class LayerNorm(nn.LayerNorm):

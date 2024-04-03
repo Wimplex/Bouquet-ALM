@@ -1,5 +1,12 @@
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Dict, Any, Type
+
+
+def cast(input: Any, target_type: Type):
+    if type(input) != target_type:
+        return target_type(input)
+    
+    return input
 
 
 def exact_div(x, y):

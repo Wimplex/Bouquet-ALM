@@ -1,9 +1,50 @@
 from typing import Iterable, Dict
+from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForCausalLM
+
+from src.models.whisper import WhisperEncoder
+from src.utils.constants import WHISPER_BASE_ENCODER_PATH
+
+
+@dataclass
+class ALMConfig:
+    # Whisper related
+    whisper_n_mels: int
+    whisper_n_audio_ctx: int
+    whisper_n_audio_state: int
+    whisper_n_audio_head: int
+    whisper_n_audio_layer: int
+    whisper_ckpt_path: str
+
+    # LLM decoder related
+    decoder_model_name: str
+
+    # Projection network related
+    # ...
+
+
+ALM_SETTINGS = {
+    # Petite
+    "bluebell": ...,
+
+    # Tiny
+    "camellia": ALMConfig(
+        whisper_n_mels=80,
+        whisper_n_audio_ctx=1500,
+        whisper_n_audio_state=512,
+        whisper_n_audio_head=8,
+        whisper_n_audio_layer=6,
+        whisper_ckpt_path=WHISPER_BASE_ENCODER_PATH,
+        decoder_model_name="stabilityai/stablelm-2-zephyr-1_6b",
+    ),
+
+    # Small
+    "lilac": ...,
+}
 
 
 SPECIAL_AUDIO_TOKENS = {
@@ -13,35 +54,55 @@ SPECIAL_AUDIO_TOKENS = {
 
 
 class ALM(nn.Module):
-    def __init__(
-        self, 
-        encoder: nn.Module, 
-        projection: nn.Module,
-        decoder: AutoModelForCausalLM, 
-        tokenizer: AutoTokenizer
-    ):
+
+    encoder: nn.Module
+    decoder: AutoModelForCausalLM
+    projection: nn.Module
+    tokenizer: AutoTokenizer
+
+    def __init__(self, config: ALMConfig):
         super().__init__()
 
-        self.encoder: nn.Module = encoder
-        self.projection: nn.Module = projection
-        self.decoder: AutoModelForCausalLM = decoder
-        self.tokenizer: AutoTokenizer = tokenizer
+        self._init_encoder(config)
+        self._init_projection(config)
+        self._init_tokenizer(config)
+        self._init_decoder(config)
 
         self._extend_vocab()
+
+    def _init_encoder(self, config: ALMConfig):
+        self.encoder = WhisperEncoder(
+            config.whisper_n_mels, 
+            config.whisper_n_audio_ctx, 
+            config.whisper_n_audio_state, 
+            config.whisper_n_audio_head, 
+            config.whisper_n_audio_layer,
+        )
+
+        ckpt = torch.load(config.whisper_ckpt_path, map_location="cpu")
+        self.encoder.load_state_dict(ckpt["model_state_dict"])
+    
+    def _init_projection(self, config: ALMConfig):
+        # TODO: Fix that
+        self.projection = nn.Linear(512, 2048)
+
+    def _init_tokenizer(self, config: ALMConfig):
+        self.tokenizer = AutoTokenizer.from_pretrained(config.decoder_model_name)
  
+    def _init_decoder(self, config: ALMConfig):
+        self.decoder = AutoModelForCausalLM.from_pretrained(config.decoder_model_name, device_map="cpu")
+
     def _extend_vocab(self):
         for new_token in SPECIAL_AUDIO_TOKENS:
             if new_token not in self.tokenizer.vocab:
                 self.tokenizer.add_tokens(new_token)
         
-        if self.decoder.model.embed_tokens.weights.shape[0] != len(self.tokenizer):
+        if self.decoder.model.embed_tokens.weight.shape[0] != len(self.tokenizer):
             self.decoder.resize_token_embeddings(len(self.tokenizer))
 
-    def _get_special_audio_tokens_embeddings(
-        self, 
-        batch_size: int,
-        device: str
-    ) -> Dict[str, torch.Tensor]:
+    def _get_special_audio_tokens_embeddings(self,
+                                             batch_size: int,
+                                             device: str) -> Dict[str, torch.Tensor]:
         emb_dim_size = self.decoder.model.embed_tokens.weight.shape[-1]
         token2emb = {}
         for str_token in ["boa_token", "eoa_token"]:
