@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import torch
 
-from .base_dataset import Audio2TextInstructDataset
+from .base_dataset import BaseA2TDataset
 from src.utils.basic import cast
 
 
@@ -15,7 +15,7 @@ def read_clotho_manifest(manifest_path: Union[Path, str]) -> pd.DataFrame:
     return df
 
 
-class ClothoDataset(Audio2TextInstructDataset):
+class ClothoDataset(BaseA2TDataset):
     def __init__(self, 
                  manifest_path: Union[Path, str], 
                  audio_path: Union[Path, str], **kwargs):

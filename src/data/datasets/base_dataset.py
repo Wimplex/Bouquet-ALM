@@ -9,7 +9,7 @@ from transformers import PreTrainedTokenizer
 from src.utils.audio import log_mel_spectrogram
 
 
-class Audio2TextInstructDataset(Dataset, ABC):
+class BaseA2TDataset(Dataset, ABC):
     def __init__(self,
                  tokenizer: PreTrainedTokenizer,
                  audio_ctx_size: int, 

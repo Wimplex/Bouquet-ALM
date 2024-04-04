@@ -50,11 +50,15 @@ class Audio2TextExperiment(LightningModule):
             - Target tokens tensor
         """
 
-        mels, input_tokens, target_tokens = batch
-        logits = self(mels, input_tokens)
-        loss = self.criterion(logits, target_tokens, dim=-1)
+        mels, tokens = batch
+        input, target = tokens[:-1], tokens[1:]
+        logits = self(mels, input)
 
-        return loss, logits, target_tokens
+        # Compute loss ignoring audio part
+        logits = logits[..., mels.shape[-1]:]
+        loss = self.criterion(logits, target, dim=-1)
+
+        return loss, logits, target
     
     def training_step(self, batch: InputBatch, batch_idx: int) -> torch.Tensor:
         loss, preds, targets = self.model_step(batch)

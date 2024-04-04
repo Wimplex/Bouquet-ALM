@@ -1,5 +1,8 @@
+import warnings
 from copy import deepcopy
 from typing import Dict, Any, Type
+
+import omegaconf
 
 
 def cast(input: Any, target_type: Type):
@@ -28,3 +31,17 @@ def filter_out_state_dict_keys(state_dict: Dict[str, Any], prefix: str) -> Dict[
             del state_dict[k]
 
     return state_dict
+
+
+def extras(config: omegaconf.DictConfig):
+    """Execute additional utilities before task:
+        - Filters warnings
+        - Prints out config tree
+    """
+    # Filter warnings
+    if config.get("filter_warnings"):
+        warnings.filterwarnings("ignore")
+    
+    # Print config tree
+    if config.get("print_config"):
+        print(omegaconf.OmegaConf.to_yaml(config))
