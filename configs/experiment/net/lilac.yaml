@@ -1,0 +1,10 @@
+defaults:
+  - encoder: whisper_base
+  - decoder: stablelm2_16
+  - projection: linear
+
+_target_: src.models.ALM
+
+projection:
+  in_features: 512
+  out_features: 2048

@@ -1,0 +1,15 @@
+defaults:
+
+  # Data related
+  - data: 
+
+  # Experiment related
+  - experiment: audio2text
+  - experiment/net: lilac
+  - experiment/optimizer: adamw
+  - experiment/scheduler: one_cycle
+
+  # Other
+  # ...
+
+  - _self_

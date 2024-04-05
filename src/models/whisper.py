@@ -1,4 +1,5 @@
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Union
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -120,23 +121,24 @@ class ResidualAttentionBlock(nn.Module):
 
 
 class WhisperEncoder(nn.Module):
-    def __init__(
-        self, 
-        n_mels: int, 
-        n_ctx: int, 
-        n_state: int, 
-        n_head: int, 
-        n_layer: int
-    ):
+    def __init__(self, n_mels: int, n_audio_ctx: int, n_audio_state: int, n_audio_head: int, n_audio_layer: int):
         super().__init__()
-        self.conv1 = Conv1d(n_mels, n_state, kernel_size=3, padding=1)
-        self.conv2 = Conv1d(n_state, n_state, kernel_size=3, stride=2, padding=1)
-        self.register_buffer("positional_embedding", sinusoids(n_ctx, n_state))
+        self.conv1 = Conv1d(n_mels, n_audio_state, kernel_size=3, padding=1)
+        self.conv2 = Conv1d(n_audio_state, n_audio_state, kernel_size=3, stride=2, padding=1)
+        self.register_buffer("positional_embedding", sinusoids(n_audio_ctx, n_audio_state))
 
         self.blocks: Iterable[ResidualAttentionBlock] = nn.ModuleList(
-            [ResidualAttentionBlock(n_state, n_head) for _ in range(n_layer)]
+            [ResidualAttentionBlock(n_audio_state, n_audio_head) for _ in range(n_audio_layer)]
         )
-        self.ln_post = LayerNorm(n_state)
+        self.ln_post = LayerNorm(n_audio_state)
+
+    @staticmethod
+    def from_pretrained(checkpoint_path: Union[Path, str], map_location: str = "cpu") -> nn.Module:
+        state_dict = torch.load(checkpoint_path, map_location=map_location)
+        whisper = WhisperEncoder(**state_dict["dims"])
+        whisper.load_state_dict(state_dict["model_state_dict"], strict=True)
+
+        return whisper
 
     def forward(self, x: torch.Tensor):
         """

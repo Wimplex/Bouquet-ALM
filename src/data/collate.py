@@ -19,4 +19,6 @@ class A2TCollator:
         mels_batch = torch.stack(mels, dim=0)
         tokens_batch = pad_sequence(tokens, padding_value=self._pad_tok_id).T
 
+        # TODO: здесь нужно формировать attention_mask
+
         return mels_batch, tokens_batch
