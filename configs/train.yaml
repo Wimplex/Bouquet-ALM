@@ -1,15 +1,20 @@
 defaults:
-
-  # Data related
-  - data: 
-
   # Experiment related
   - experiment: audio2text
   - experiment/net: lilac
   - experiment/optimizer: adamw
   - experiment/scheduler: one_cycle
 
-  # Other
-  # ...
+  # Data related
+  - data: audio2text
+  - data/datasets@data.train_datasets:
+    - clotho
+  - data/datasets@data.val_datasets:
+    - clotho
 
+  # Other
   - _self_
+  
+
+filter_warnings: true
+print_config: true

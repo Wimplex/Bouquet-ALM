@@ -1,0 +1,9 @@
+_target_: src.data.module.A2TDataModule
+train_batch_size: 16
+val_batch_size: 16
+num_workers: 1
+pin_memory: true
+
+tokenizer:
+  _target_: transformers.AutoTokenizer.from_pretrained
+  pretrained_model_name_or_path: ${experiment.net.decoder.pretrained_model_name_or_path}

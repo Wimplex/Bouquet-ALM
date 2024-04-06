@@ -1,0 +1,45 @@
+experiment:
+  _target_: src.experiment.Audio2TextExperiment
+  net:
+    encoder:
+      _target_: src.models.WhisperEncoder.from_pretrained
+      ckpt_path: ./assets/whisper_base_encoder.pt
+      map_location: cpu
+    decoder:
+      _target_: transformers.AutoModelForCausalLM.from_pretrained
+      pretrained_model_name_or_path: stabilityai/stablelm-2-zephyr-1_6b
+      device_map: cpu
+    projection:
+      _target_: torch.nn.Linear
+      in_features: 512
+      out_features: 2048
+    _target_: src.models.ALM
+  optimizer: {}
+  scheduler: {}
+  frozen_parts:
+  - net.encoder
+data:
+  _target_: src.data.module.A2TDataModule
+  train_batch_size: 16
+  val_batch_size: 16
+  num_workers: 1
+  pin_memory: true
+  tokenizer:
+    _target_: transformers.AutoTokenizer.from_pretrained
+    pretrained_model_name_or_path: ${experiment.net.decoder.pretrained_model_name_or_path}
+  train_datasets:
+    _partial_: true
+    audio_ctx_size: 3000
+    audio_n_mels: 80
+    _target_: src.data.datasets.ClothoDataset
+    manifest_path: ???
+    audio_path: ???
+  val_datasets:
+    _partial_: true
+    audio_ctx_size: 3000
+    audio_n_mels: 80
+    _target_: src.data.datasets.ClothoDataset
+    manifest_path: ???
+    audio_path: ???
+filter_warnings: true
+print_config: true

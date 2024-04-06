@@ -3,6 +3,8 @@ from copy import deepcopy
 from typing import Dict, Any, Type
 
 import omegaconf
+from rich.console import Console
+from rich.syntax import Syntax
 
 
 def cast(input: Any, target_type: Type):
@@ -44,4 +46,6 @@ def extras(config: omegaconf.DictConfig):
     
     # Print config tree
     if config.get("print_config"):
-        print(omegaconf.OmegaConf.to_yaml(config))
+        yaml = omegaconf.OmegaConf.to_yaml(config, resolve=True)
+        syntax = Syntax(yaml, "yaml")
+        Console().print(syntax)

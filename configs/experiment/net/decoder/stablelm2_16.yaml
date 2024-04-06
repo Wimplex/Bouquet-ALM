@@ -1,3 +1,3 @@
 _target_: transformers.AutoModelForCausalLM.from_pretrained
-model_name: stabilityai/stablelm-2-zephyr-1_6b
+pretrained_model_name_or_path: stabilityai/stablelm-2-zephyr-1_6b
 device_map: cpu

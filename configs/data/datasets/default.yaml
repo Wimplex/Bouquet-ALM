@@ -1,0 +1,5 @@
+_partial_: true
+
+# Hard-coded from Whisper specs
+audio_ctx_size: 3000
+audio_n_mels: 80

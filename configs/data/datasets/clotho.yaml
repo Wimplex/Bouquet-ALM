@@ -1,0 +1,6 @@
+defaults:
+  - default
+
+_target_: src.data.datasets.ClothoDataset
+manifest_path: ???
+audio_path: ???

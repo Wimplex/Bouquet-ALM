@@ -6,6 +6,8 @@ device = "cuda" # the device to load the model onto
 model_name = "Qwen/Qwen1.5-1.8B-Chat"
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained(model_name)
+print(tokenizer.model_max_length)
+exit()
 
 prompt = "Напиши 10 фактов об амурских тиграх."
 messages = [

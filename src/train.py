@@ -1,10 +1,7 @@
-from typing import Iterable
-
 import hydra
 import omegaconf
 import pytorch_lightning as pl
 
-from src.models.alm import ALM, ALM_SETTINGS
 from src.utils.basic import extras
 from src.utils.logger import RankedLogger
 
@@ -13,15 +10,16 @@ log = RankedLogger(name=__name__, rank_zero_only=True)
 
 
 def train(cfg: omegaconf.DictConfig) -> None:
+    omegaconf.OmegaConf.resolve(cfg)
 
     if cfg.get("random_seed"):
         pl.seed_everything(cfg.seed, workers=True)
 
-    log.info(f"Instantiating datamodule")
-    datamodule: pl.LightningDataModule = hydra.utils.instantiate(cfg.data)
-
     log.info(f"Instantiating experiment")
     experiment: pl.LightningModule = hydra.utils.instantiate(cfg.experiment)
+
+    log.info(f"Instantiating datamodule")
+    datamodule: pl.LightningDataModule = hydra.utils.instantiate(cfg.data)
 
     # log.info(f"Instantiating callbacks")
     # callbacks: Iterable[pl.Callback] = hydra.utils.instantiate(cfg.callbacks)
@@ -37,7 +35,7 @@ def train(cfg: omegaconf.DictConfig) -> None:
     trainer.fit(model=experiment, datamodule=datamodule, ckpt_path=cfg.get("cpkt_path"))
 
 
-@hydra.main("./configs", "train.yaml")
+@hydra.main("../configs", "train.yaml", version_base="1.1")
 def main(cfg: omegaconf.DictConfig) -> None:
     extras(cfg)
     train(cfg)
