@@ -163,6 +163,8 @@ cython_debug/
 # Project
 temp.*
 assets/
+output/
+outputs/
 samples/
 weights/
 notebooks/
