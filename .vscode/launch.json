@@ -8,7 +8,7 @@
             "name": "train",
             "type": "debugpy",
             "request": "launch",
-            "module": "src.cli.train",
+            "module": "src.train",
             "console": "integratedTerminal"
         }
     ]

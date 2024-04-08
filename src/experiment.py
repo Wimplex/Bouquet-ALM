@@ -1,8 +1,14 @@
-from typing import Iterable, Tuple, Dict, Any
+from typing import Tuple, Dict, Any
 
 import torch
-from pytorch_lightning import LightningModule
 from torchmetrics import MeanMetric
+from pytorch_lightning import LightningModule
+from transformers.modeling_outputs import ModelOutput
+
+from src.utils.logger import RankedLogger
+
+
+log = RankedLogger(name=__name__, rank_zero_only=True)
 
 
 InputBatch = Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
@@ -12,8 +18,7 @@ class Audio2TextExperiment(LightningModule):
     def __init__(self,
                  net: torch.nn.Module,
                  optimizer: torch.optim.Optimizer,
-                 scheduler: torch.optim.lr_scheduler.LRScheduler = None,
-                 frozen_parts: Iterable[str] = None):
+                 scheduler: torch.optim.lr_scheduler.LRScheduler = None):
         super().__init__()
 
         self.save_hyperparameters(logger=False)
@@ -26,15 +31,11 @@ class Audio2TextExperiment(LightningModule):
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
 
-    def setup(self, stage: str) -> None:
-        if self.hparams.frozen_part is not None and stage == "fit":
-            for part_name in self.hparams.frozen_parts:
-                for p_name, p in self.net.named_parameters():
-                    if p_name.startswith(part_name):
-                        p.requires_grad_(False)
-
-    def forward(self, mels: torch.Tensor, texts: Iterable[str]):
-        return self.net(mels, texts)
+    def forward(self, 
+                mels: torch.Tensor, 
+                tokens: torch.Tensor, 
+                attention_mask: torch.Tensor) -> ModelOutput:
+        return self.net(mels, tokens, attention_mask)
     
     def model_step(self, batch: InputBatch) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Performs a single model step with output logits and loss computation.
@@ -49,16 +50,16 @@ class Audio2TextExperiment(LightningModule):
             - Output logits tensor
             - Target tokens tensor
         """
-
-        mels, tokens = batch
-        input, target = tokens[:-1], tokens[1:]
-        logits = self(mels, input)
+        mels, tokens, attn_mask = batch
+        inputs, targets = tokens[:,:-1], tokens[:,1:]
+        attn_mask = attn_mask[...,:-1]
+        output: ModelOutput = self(mels, inputs, attn_mask)
 
         # Compute loss ignoring audio part
-        logits = logits[..., mels.shape[-1]:]
-        loss = self.criterion(logits, target, dim=-1)
+        logits = output.logits[..., mels.shape[-1]:]
+        loss = self.criterion(logits, targets)
 
-        return loss, logits, target
+        return loss, logits, targets
     
     def training_step(self, batch: InputBatch, batch_idx: int) -> torch.Tensor:
         loss, preds, targets = self.model_step(batch)
@@ -87,8 +88,6 @@ class Audio2TextExperiment(LightningModule):
         self.log("test/loss", self.test_loss.compute(), on_step=False, on_epoch=True)
 
     def configure_optimizers(self) -> Dict[str, Any]:
-
-        # TODO: Нужно ли вообще через trainer стучаться до модели?
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
 
         if self.hparams.scheduler is not None:

@@ -1,0 +1,6 @@
+defaults:
+  - default
+
+_target_: src.data.datasets.ClothoDataset
+manifest_path: "${paths.datasets_root_dir}/Captioning/clotho_audio_development/clotho_captions_development.csv"
+audio_path: "${paths.datasets_root_dir}/Captioning/clotho_audio_development/development"

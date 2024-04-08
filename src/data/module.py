@@ -1,27 +1,30 @@
 from typing import Iterable, Union
+from functools import partial
 
-import hydra
-import omegaconf
 from transformers import PreTrainedTokenizer
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 from pytorch_lightning import LightningDataModule
 
 from .collate import A2TCollator
+from src.utils.logger import RankedLogger
 
 
-def init_datasets(datasets_configs: Iterable[omegaconf.DictConfig], **kwargs) -> Union[Dataset, Iterable[Dataset]]:
-    datasets = []
-    for dset_cfg in datasets_configs:
-        dataset = hydra.utils.instantiate(dset_cfg, **kwargs)
-        datasets.append(dataset)
+log = RankedLogger(name=__name__, rank_zero_only=True)
+
+
+def instantiate_partial_datasets(partial_datasets: Union[partial, Iterable[partial]], 
+                                 **kwargs) -> Union[Dataset, Iterable[Dataset]]:
+    if not isinstance(partial_datasets, Iterable):
+        partial_datasets = [partial_datasets]
+    datasets = [part_dset(**kwargs) for part_dset in partial_datasets]
     
-    return dataset
+    return datasets
 
 
 class A2TDataModule(LightningDataModule):
     def __init__(self, 
-                 train_datasets: Iterable[omegaconf.DictConfig],
-                 val_datasets: Iterable[omegaconf.DictConfig],
+                 train_datasets: Union[partial, Iterable[partial]],
+                 val_datasets: Union[partial, Iterable[partial]],
                  train_batch_size: int = 1, 
                  val_batch_size: int = 1,
                  num_workers: int = 1,
@@ -43,8 +46,14 @@ class A2TDataModule(LightningDataModule):
             self.per_device_val_batch_size = self.hparams.val_batch_size // self.trainer.world_size
 
         self.collate_fn = A2TCollator(self._tokenizer.model_max_length, self._tokenizer.pad_token_id)
-        self.train_datasets = init_datasets(self.hparams.train_datasets, tokenizer=self._tokenizer)
-        self.val_datasets = init_datasets(self.hparams.val_datasets, tokenizer=self._tokenizer)
+        
+        log.info(f"Instantiating train datasets")
+        self.train_datasets = instantiate_partial_datasets(
+            self.hparams.train_datasets, tokenizer=self._tokenizer)
+
+        log.info(f"Instantiating val datasets")
+        self.val_datasets = instantiate_partial_datasets(
+            self.hparams.val_datasets, tokenizer=self._tokenizer)
         
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
@@ -53,7 +62,8 @@ class A2TDataModule(LightningDataModule):
             shuffle=True,
             collate_fn=self.collate_fn,
             num_workers=self.hparams.num_workers,
-            pin_memory=self.hparams.pin_memory
+            pin_memory=self.hparams.pin_memory,
+            drop_last=True
         )
     
     def val_dataloader(self) -> Iterable[DataLoader]:

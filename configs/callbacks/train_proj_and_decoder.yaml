@@ -1,0 +1,2 @@
+_target_: src.callbacks.FreezeCallback
+modules_to_freeze: ["net.encoder"]

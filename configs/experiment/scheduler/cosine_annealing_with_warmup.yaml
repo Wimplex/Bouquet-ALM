@@ -1,0 +1,4 @@
+_target_: transformers.get_cosine_schedule_with_warmup
+_partial_: true
+num_warmup_steps: 1000
+num_training_steps: ${eval:'${trainer.limit_train_batches} // ${trainer.accumulate_grad_batches} * ${trainer.max_epochs}'}

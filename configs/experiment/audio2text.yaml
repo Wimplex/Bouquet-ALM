@@ -2,4 +2,3 @@ _target_: src.experiment.Audio2TextExperiment
 net: ???
 optimizer: ???
 scheduler: ???
-frozen_parts: ["net.encoder"]

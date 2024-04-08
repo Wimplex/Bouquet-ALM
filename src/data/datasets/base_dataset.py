@@ -11,17 +11,16 @@ from src.utils.audio import log_mel_spectrogram
 
 class BaseA2TDataset(Dataset, ABC):
     def __init__(self,
+                 *,
                  tokenizer: PreTrainedTokenizer,
                  audio_ctx_size: int, 
-                 audio_n_mels: int = 80):
-        
+                 audio_n_mels: int):        
         self.tokenizer = tokenizer
         self.audio_ctx_size = audio_ctx_size
         self.audio_n_mels = audio_n_mels
 
         self.key2text = self.build_key2text()
         self.key2audio = self.build_key2audio()
-
         self._keys = list(self.key2text.keys())
 
     @abstractmethod

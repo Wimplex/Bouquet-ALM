@@ -9,7 +9,7 @@ class A2TCollator:
         self._ctx_size = lm_ctx_size
         self._pad_tok_id = lm_pad_token_id
 
-    def __call__(self, batch: Iterable[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __call__(self, batch: Iterable[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Performs batchification on unaligned input.
 
         :param batch: 
@@ -18,7 +18,6 @@ class A2TCollator:
         mels, tokens = zip(*batch)
         mels_batch = torch.stack(mels, dim=0)
         tokens_batch = pad_sequence(tokens, padding_value=self._pad_tok_id).T
+        attention_mask = (tokens_batch != 0).to(torch.int8)
 
-        # TODO: здесь нужно формировать attention_mask
-
-        return mels_batch, tokens_batch
+        return mels_batch, tokens_batch, attention_mask

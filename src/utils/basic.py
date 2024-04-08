@@ -1,10 +1,11 @@
 import warnings
 from copy import deepcopy
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, Iterable, List, Union
 
-import omegaconf
-from rich.console import Console
+import hydra
+from omegaconf import OmegaConf, DictConfig
 from rich.syntax import Syntax
+from rich.console import Console
 
 
 def cast(input: Any, target_type: Type):
@@ -35,17 +36,34 @@ def filter_out_state_dict_keys(state_dict: Dict[str, Any], prefix: str) -> Dict[
     return state_dict
 
 
-def extras(config: omegaconf.DictConfig):
+def before_task(config: DictConfig):
     """Execute additional utilities before task:
+        - Adds 'eval' resolver to OmegaConf
         - Filters warnings
         - Prints out config tree
+        - Performs config tree resolution (parameter interpolation)
     """
+
+    OmegaConf.register_new_resolver("eval", eval)
+
     # Filter warnings
     if config.get("filter_warnings"):
         warnings.filterwarnings("ignore")
     
     # Print config tree
     if config.get("print_config"):
-        yaml = omegaconf.OmegaConf.to_yaml(config, resolve=True)
+        yaml = OmegaConf.to_yaml(config, resolve=True)
         syntax = Syntax(yaml, "yaml")
         Console().print(syntax)
+
+    OmegaConf.resolve(config)
+
+
+def instantiate_list_configs(configs: Union[DictConfig, List[DictConfig]]) -> List[Any]:
+    """Instantiates config entities stored in a list.
+    Converts to a list if it is not one.
+    """
+    if not isinstance(configs, List):
+        configs = [configs]
+    
+    return [hydra.utils.instantiate(cfg) for cfg in configs]

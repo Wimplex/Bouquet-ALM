@@ -3,18 +3,34 @@ defaults:
   - experiment: audio2text
   - experiment/net: lilac
   - experiment/optimizer: adamw
-  - experiment/scheduler: one_cycle
+  - experiment/scheduler: cosine_annealing_with_warmup
 
   # Data related
   - data: audio2text
   - data/datasets@data.train_datasets:
-    - clotho
+    - clotho_dev
   - data/datasets@data.val_datasets:
-    - clotho
+    - clotho_dev
 
-  # Other
+  # Trainer
+  - trainer: default
+  - callbacks:
+    - train_proj_only
+
   - _self_
   
-
 filter_warnings: true
 print_config: true
+
+paths:
+  output_dir: ???
+  datasets_root_dir: "../../../../../Datasets/speech"
+
+data:
+  train_batch_size: 2
+  val_batch_size: 2
+
+trainer:
+  min_epochs: 40
+  max_epochs: 40
+  accumulate_grad_batches: 16

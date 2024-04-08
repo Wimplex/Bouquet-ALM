@@ -18,7 +18,8 @@ def read_clotho_manifest(manifest_path: Union[Path, str]) -> pd.DataFrame:
 class ClothoDataset(BaseA2TDataset):
     def __init__(self, 
                  manifest_path: Union[Path, str], 
-                 audio_path: Union[Path, str], **kwargs):
+                 audio_path: Union[Path, str], 
+                 **kwargs):
         self._df = read_clotho_manifest(manifest_path)
         self._audio_path = cast(audio_path, Path)
         super().__init__(**kwargs)

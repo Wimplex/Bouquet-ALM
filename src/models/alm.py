@@ -1,17 +1,9 @@
-from typing import Iterable, Dict
+from typing import Dict
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import transformers
-
-from src.models.whisper import WhisperEncoder
-
-
-SPECIAL_AUDIO_TOKENS = {
-    "boa_token": "<|startofaudio|>", 
-    "eoa_token": "<|endofaudio|>"
-}
 
 
 class ALM(nn.Module):
@@ -60,16 +52,16 @@ class ALM(nn.Module):
         enc_tokens = self._encode_tokens(tokens)
 
         # TODO: отделить аудио-часть специальным токеном (или их последовательностью)
-        ...
+        # ...
 
         input_batch = torch.concat([enc_audio, enc_tokens], dim=1)
 
         # Extend attention mask according to audio encoding size
-        T = enc_audio.shape[-1]
+        T = enc_audio.shape[1]
         attention_mask = F.pad(attention_mask, [T, 0], mode="constant", value=1)
 
         return {
-            "input_embeds": input_batch,
+            "inputs_embeds": input_batch,
             "attention_mask": attention_mask,
         }
     
