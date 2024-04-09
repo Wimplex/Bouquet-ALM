@@ -37,14 +37,7 @@ def train(cfg: DictConfig) -> None:
 @hydra.main("../configs", "train.yaml", version_base="1.1")
 def main(cfg: DictConfig) -> None:
     before_task(cfg)
-    exit()
     train(cfg)
-
-
-# TODO:
-# 1. Немного переделать класс модели
-# 2. Запустить первый эксперимент с обучением проективного слоя
-
 
 if __name__ == "__main__":
     main()
