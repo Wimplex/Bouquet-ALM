@@ -1,15 +1,18 @@
-# Bouquet-ALM
+<div align="center">
 
-### Варианты нейминга (в порядке возрастания размера)
+# Bouquet-ALM
+</div>
+
+
+The goal of the Bouquet-ALM project is to create a set of small speech understanding models **with decent reasoning abilities**.
+
+### Naming
 * Bluebell (petite)
 * Camellia (tiny)
-* Lilac (small) <- whisper_base + stablelm-2b
+* Lilac (small)
 
-### Быстрый рейтинг SLM:
-1-2. StableLM
-1-2. Phi-2
-3. Qwen-1.5
-
-# Идеи
-1. Тюн phi-2 на инструкции в колабе (saiga dataset / genstruct + MT)
-2. ...
+### TODO
+ - [ ] Run training pipeline from the beginning to the end
+ - [ ] Create textual reasoning dataset on speech descriptions (*maybe*)
+ - [ ] Define best modality adaptation strategy
+ - [ ] Create small set of models
