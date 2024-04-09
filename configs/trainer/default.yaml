@@ -1,7 +1,6 @@
 _target_: pytorch_lightning.Trainer
 
 # Training
-precision: 16-mixed
 max_epochs: ???
 min_epochs: ${trainer.max_epochs}
 limit_train_batches: 10000

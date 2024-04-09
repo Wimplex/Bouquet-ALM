@@ -37,6 +37,7 @@ def train(cfg: DictConfig) -> None:
 @hydra.main("../configs", "train.yaml", version_base="1.1")
 def main(cfg: DictConfig) -> None:
     before_task(cfg)
+    exit()
     train(cfg)
 
 

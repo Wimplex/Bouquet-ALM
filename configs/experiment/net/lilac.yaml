@@ -1,6 +1,6 @@
 defaults:
   - encoder: whisper_base
-  - decoder: stablelm2_16
+  - decoder: tinyllama_chat
   - projection: linear
 
 _target_: src.models.ALM

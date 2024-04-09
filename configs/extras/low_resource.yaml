@@ -1,0 +1,9 @@
+# @package _global_
+
+data:
+  train_batch_size: 2
+  val_batch_size: 2
+
+trainer:
+  precision: 16-mixed
+  accumulate_grad_batches: 16

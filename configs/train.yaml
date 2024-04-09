@@ -1,9 +1,9 @@
 defaults:
-  # Experiment related
+  # Experiment
   - experiment: audio2text_adafactor_auto_lr
   - experiment/net: lilac
 
-  # Data related
+  # Data
   - data: audio2text
   - data/datasets@data.train_datasets:
     - clotho_dev
@@ -15,19 +15,15 @@ defaults:
   - callbacks:
     - train_proj_only
 
+  - extras:
+    - low_resource
+    - misc
+
   - _self_
-  
-filter_warnings: true
-print_config: false
 
 paths:
   output_dir: ???
   datasets_root_dir: "../../../../../Datasets/speech"
 
-data:
-  train_batch_size: 2
-  val_batch_size: 2
-
 trainer:
-  max_epochs: 40
-  accumulate_grad_batches: 16
+  max_epochs: 10
