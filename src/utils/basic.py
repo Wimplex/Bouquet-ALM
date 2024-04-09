@@ -1,6 +1,7 @@
+import os
 import warnings
 from copy import deepcopy
-from typing import Dict, Any, Type, Iterable, List, Union
+from typing import Dict, Any, Type, List, Union
 
 import hydra
 from omegaconf import OmegaConf, DictConfig
@@ -38,12 +39,16 @@ def filter_out_state_dict_keys(state_dict: Dict[str, Any], prefix: str) -> Dict[
 
 def before_task(config: DictConfig):
     """Execute additional utilities before task:
+        - Updates env variables
         - Adds 'eval' resolver to OmegaConf
         - Filters warnings
         - Prints out config tree
         - Performs config tree resolution (parameter interpolation)
     """
+    # Update environment variables
+    os.environ["HYDRA_FULL_ERROR"] = "1"
 
+    # Add eval resolver to OmegaConf
     OmegaConf.register_new_resolver("eval", eval)
 
     # Filter warnings
@@ -56,6 +61,7 @@ def before_task(config: DictConfig):
         syntax = Syntax(yaml, "yaml")
         Console().print(syntax)
 
+    # Interpolate configs
     OmegaConf.resolve(config)
 
 

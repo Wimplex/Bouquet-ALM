@@ -57,7 +57,7 @@ class A2TDataModule(LightningDataModule):
         
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
-            dataset=ConcatDataset(self.train_dataset),
+            dataset=ConcatDataset(self.train_datasets),
             batch_size=self.per_device_train_batch_size,
             shuffle=True,
             collate_fn=self.collate_fn,

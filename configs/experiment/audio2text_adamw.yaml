@@ -1,0 +1,6 @@
+defaults:
+  - optimizer: adamw
+  - scheduler: cosine_annealing_with_warmup
+
+_target_: src.experiment.Audio2TextExperiment
+net: ???

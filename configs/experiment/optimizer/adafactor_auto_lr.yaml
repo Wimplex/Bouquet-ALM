@@ -1,0 +1,6 @@
+_target_: transformers.optimization.Adafactor
+_partial_: true
+scale_parameter: true
+relative_step: true
+warmup_init: true
+lr: null

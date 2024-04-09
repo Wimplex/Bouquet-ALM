@@ -1,17 +1,15 @@
 from typing import Tuple, Dict, Any
 
 import torch
+from einops import rearrange
 from torchmetrics import MeanMetric
 from pytorch_lightning import LightningModule
-from transformers.modeling_outputs import ModelOutput
 
 from src.utils.logger import RankedLogger
 
 
-log = RankedLogger(name=__name__, rank_zero_only=True)
-
-
 InputBatch = Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+log = RankedLogger(name=__name__, rank_zero_only=True)
 
 
 class Audio2TextExperiment(LightningModule):
@@ -34,7 +32,7 @@ class Audio2TextExperiment(LightningModule):
     def forward(self, 
                 mels: torch.Tensor, 
                 tokens: torch.Tensor, 
-                attention_mask: torch.Tensor) -> ModelOutput:
+                attention_mask: torch.Tensor) -> Dict[str, torch.Tensor]:
         return self.net(mels, tokens, attention_mask)
     
     def model_step(self, batch: InputBatch) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -43,7 +41,7 @@ class Audio2TextExperiment(LightningModule):
         :param batch: A tuple of input tensors:
             - Mel-features tensor
             - Input tokens tensor
-            - Target tokens tensor
+            - Attention mask tensor
 
         :return: A tuple of:
             - Loss tensor
@@ -53,11 +51,14 @@ class Audio2TextExperiment(LightningModule):
         mels, tokens, attn_mask = batch
         inputs, targets = tokens[:,:-1], tokens[:,1:]
         attn_mask = attn_mask[...,:-1]
-        output: ModelOutput = self(mels, inputs, attn_mask)
+        output = self(mels, inputs, attn_mask)
 
-        # Compute loss ignoring audio part
-        logits = output.logits[..., mels.shape[-1]:]
-        loss = self.criterion(logits, targets)
+        # Compute loss only for text instruct
+        logits = output["logits"][:, -inputs.shape[-1]:]
+        loss = self.criterion(
+            rearrange(logits, "b t c -> (b t) c"), 
+            rearrange(targets, "b t -> (b t)")
+        )
 
         return loss, logits, targets
     

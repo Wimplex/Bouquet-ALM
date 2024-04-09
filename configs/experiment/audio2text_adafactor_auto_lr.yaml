@@ -1,0 +1,6 @@
+defaults:
+  - optimizer: adafactor_auto_lr
+
+_target_: src.experiment.Audio2TextExperiment
+net: ???
+scheduler: null

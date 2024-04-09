@@ -70,7 +70,7 @@ class ALM(nn.Module):
                 tokens: torch.Tensor, 
                 attention_mask: torch.Tensor) -> Dict[str, torch.Tensor]:
         inputs = self.encode_multimodal_inputs(mels, tokens, attention_mask)
-        output = self.decoder(**inputs)
+        output = self.decoder(**inputs, return_dict=True)
 
         return output
 

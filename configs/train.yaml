@@ -1,9 +1,7 @@
 defaults:
   # Experiment related
-  - experiment: audio2text
+  - experiment: audio2text_adafactor_auto_lr
   - experiment/net: lilac
-  - experiment/optimizer: adamw
-  - experiment/scheduler: cosine_annealing_with_warmup
 
   # Data related
   - data: audio2text
@@ -20,7 +18,7 @@ defaults:
   - _self_
   
 filter_warnings: true
-print_config: true
+print_config: false
 
 paths:
   output_dir: ???
@@ -31,6 +29,5 @@ data:
   val_batch_size: 2
 
 trainer:
-  min_epochs: 40
   max_epochs: 40
   accumulate_grad_batches: 16

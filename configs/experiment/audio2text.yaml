@@ -1,4 +1,0 @@
-_target_: src.experiment.Audio2TextExperiment
-net: ???
-optimizer: ???
-scheduler: ???

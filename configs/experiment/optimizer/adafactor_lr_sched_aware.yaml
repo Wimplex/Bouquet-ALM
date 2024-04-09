@@ -1,0 +1,5 @@
+_target_: transformers.optimization.Adafactor
+_partial_: true
+lr: 1e-5
+scale_parameter: false
+relative_step: false

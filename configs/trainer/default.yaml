@@ -1,6 +1,7 @@
 _target_: pytorch_lightning.Trainer
 
 # Training
+precision: 16-mixed
 max_epochs: ???
 min_epochs: ${trainer.max_epochs}
 limit_train_batches: 10000
@@ -9,7 +10,7 @@ reload_dataloaders_every_n_epochs: 1
 
 # Validation
 log_every_n_steps: 100
-num_sanity_val_steps: 10
+num_sanity_val_steps: 5
 
 # Misc
 enable_progress_bar: true
