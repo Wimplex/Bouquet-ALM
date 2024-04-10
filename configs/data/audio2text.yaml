@@ -1,7 +1,7 @@
 _target_: src.data.module.A2TDataModule
 train_batch_size: 16
 val_batch_size: 16
-num_workers: 1
+num_workers: 8
 pin_memory: true
 
 tokenizer:

@@ -16,8 +16,8 @@ defaults:
     - train_proj_only
 
   - extras:
-    - low_resource
     - misc
+    - low_resource
 
   - _self_
 

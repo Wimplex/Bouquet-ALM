@@ -6,12 +6,18 @@
 
 The goal of the Bouquet-ALM project is to create a set of small speech understanding models **with decent reasoning abilities**.
 
-### Naming
-* Bluebell (petite)
-* Camellia (tiny)
-* Lilac (small)
+## Naming
+:blossom: **Lilac** (small)<br>
+Small but mighty ALM with honourable abilities.
 
-### TODO
+:blossom: **Camellia** (tiny)<br>
+...
+
+:blossom: **Bluebell** (petite)<br> 
+Our smallest model for the youngest researchers.
+
+## To Do
+ - [ ] Get rid of embedded Whisper. Load it from hf-hub.
  - [ ] Run training pipeline from the beginning to the end
  - [ ] Create textual reasoning dataset on speech descriptions (*maybe*)
  - [ ] Define best modality adaptation strategy
