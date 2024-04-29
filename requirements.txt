@@ -1,0 +1,11 @@
+einops==0.8.0
+hydra-core==1.3.2
+lightning_utilities==0.11.2
+numpy==1.26.4
+omegaconf==2.3.0
+pandas==2.2.2
+pytorch_lightning==2.2.1
+rich==13.7.1
+torch==2.2.1+cu118
+torchmetrics==1.3.2
+transformers==4.38.2
