@@ -23,8 +23,6 @@ defaults:
   - _self_
 
 
-task_name: ???
-
 paths:
   output_dir: ???
   datasets_root_dir: "../../../../../Datasets/speech"
