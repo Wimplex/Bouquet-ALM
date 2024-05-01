@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import transformers
+import transformers.modeling_outputs
 
 
 class ALM(nn.Module):
@@ -18,7 +19,7 @@ class ALM(nn.Module):
         self.decoder: transformers.PreTrainedModel = decoder
 
     def _encode_tokens(self, tokens_batch: torch.Tensor) -> torch.Tensor:
-        """Performs tokens encoding by decoder's Embedding layer
+        """Performs tokens encoding by decoder's embedding layer
 
         :param tokens_batch: Input tokens.
         :return: 3d batched tensor of encoded tokens.
@@ -29,9 +30,13 @@ class ALM(nn.Module):
         """Performs mel-features encoding by sequent encoder and projection application.
 
         :param mels_batch: Batched mel-features.
-        :return: 3d batched context matrix of input mel-features.
+        :return: 3d batched context matrix of input mel-features [B, C, T].
         """
-        return self.proj(self.encoder(mels_batch))
+        audio_context = self.encoder(mels_batch)
+        if isinstance(audio_context, transformers.modeling_outputs.BaseModelOutput):
+            audio_context = audio_context.last_hidden_state
+
+        return self.proj(audio_context)
 
     def encode_multimodal_inputs(self, 
                                  mels: torch.Tensor, 
@@ -39,7 +44,7 @@ class ALM(nn.Module):
                                  attention_mask: torch.Tensor) -> torch.Tensor:
         """Performs encoding of all the inputs with awareness to attention mask change.
 
-        :param mels: _description_
+        :param mels: Batched matrix of mel-filterbank features of size [B, T, C]
         :type mels: torch.Tensor
         :param tokens: _description_
         :type tokens: torch.Tensor

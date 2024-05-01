@@ -17,8 +17,9 @@ Small but mighty ALM with honourable abilities.
 Our smallest model for the youngest researchers.
 
 ## To Do
- - [ ] Get rid of embedded Whisper. Load it from hf-hub.
+ - [ ] Support a more versatile project structure with the ability to use different encoders.
+ - [x] Get rid of embedded Whisper. Load it from hf-hub.
  - [ ] Run training pipeline from the beginning to the end
- - [ ] Create textual reasoning dataset on speech descriptions (*maybe*)
- - [ ] Define best modality adaptation strategy
- - [ ] Create small set of models
+ - [ ] Create textual reasoning dataset on speech descriptions (*maybe*).
+ - [ ] Define best modality adaptation strategy.
+ - [ ] Create small set of models.

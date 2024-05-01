@@ -3,10 +3,13 @@ import warnings
 from copy import deepcopy
 from typing import Dict, Any, Type, List, Union
 
+
+import torch
 import hydra
 from omegaconf import OmegaConf, DictConfig
 from rich.syntax import Syntax
 from rich.console import Console
+from transformers import AutoModel
 
 
 def cast(input: Any, target_type: Type):
@@ -73,3 +76,19 @@ def instantiate_list_configs(configs: Union[DictConfig, List[DictConfig]]) -> Li
         configs = [configs]
     
     return [hydra.utils.instantiate(cfg) for cfg in configs]
+
+
+def instantiate_part_of_hf_model(model_name: str, part: str, **kwargs) -> torch.nn.Module:
+    """Instantiate specific part of huggingface' transformers model.
+
+    :param model_name: ...
+    :type model_name: str
+    :param part: Part to be returned
+    :type part: str
+    :return: ...
+    :rtype: torch.nn.Module
+    """
+    model = AutoModel.from_pretrained(model_name, **kwargs)
+    model = getattr(model, part)
+
+    return model

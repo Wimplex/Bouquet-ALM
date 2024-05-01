@@ -1,0 +1,3 @@
+_target_: src.models.WhisperEncoder.from_pretrained
+checkpoint_path: "../../../assets/whisper_base_encoder.pt"
+map_location: cpu

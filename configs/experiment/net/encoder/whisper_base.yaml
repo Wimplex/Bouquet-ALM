@@ -1,3 +1,4 @@
-_target_: src.models.WhisperEncoder.from_pretrained
-checkpoint_path: "../../../assets/whisper_base_encoder.pt"
-map_location: cpu
+_target_: src.utils.basic.instantiate_part_of_hf_model
+model_name: "openai/whisper-base"
+part: "encoder"
+device_map: "cpu"

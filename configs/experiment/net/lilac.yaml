@@ -2,6 +2,9 @@ defaults:
   - encoder: whisper_base
   - decoder: tinyllama_chat
   - projection: linear
+  
+  # Or use a local Whisper encoder
+  # - encoder: pure_whisper_base
 
 _target_: src.models.ALM
 
