@@ -12,6 +12,7 @@ defaults:
 
   # Trainer
   - trainer: default
+  - logger: tensorboard
   - callbacks:
     - train_proj_only
 
@@ -20,6 +21,9 @@ defaults:
     - low_resource
 
   - _self_
+
+
+task_name: ???
 
 paths:
   output_dir: ???

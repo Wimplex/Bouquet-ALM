@@ -24,9 +24,8 @@ def train(cfg: DictConfig) -> None:
     log.info(f"Instantiating callbacks")
     callbacks: Iterable[pl.Callback] = instantiate_list_configs(cfg.callbacks)
 
-    # log.info(f"Instantiating loggers")
-    # logger: Iterable[pl.] = hydra.utils.instantiate(cfg.loggers)
-    logger = None
+    log.info(f"Instantiating logger")
+    logger: Iterable[pl.loggers.Logger] = hydra.utils.instantiate(cfg.logger)
 
     log.info(f"Instantiating trainer")
     trainer: pl.Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
