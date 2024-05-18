@@ -23,3 +23,4 @@ Our smallest model for the youngest researchers.
  - [ ] Create textual reasoning dataset on speech descriptions (*maybe*).
  - [ ] Define best modality adaptation strategy.
  - [ ] Create small set of models.
+ - [ ] Transfer logic of tokeniser definition to decoder configs. And then just refer to data.audio2text.

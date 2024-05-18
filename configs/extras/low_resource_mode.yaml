@@ -1,5 +1,8 @@
 # @package _global_
 
+defaults:
+  - default
+
 data:
   train_batch_size: 2
   val_batch_size: 2

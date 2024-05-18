@@ -1,0 +1,10 @@
+# @package _global_
+
+defaults:
+  - default
+
+trainer:
+  devices: 2
+  strategy: ddp
+  accelerator: cpu
+  sync_batchnorm: true

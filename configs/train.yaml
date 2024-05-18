@@ -1,5 +1,4 @@
 defaults:
-  # Experiment
   - experiment: audio2text_adafactor_auto_lr
   - experiment/net: lilac
 
@@ -10,17 +9,15 @@ defaults:
   - data/datasets@data.val_datasets:
     - clotho_dev
 
-  # Trainer
   - trainer: default
   - logger: tensorboard
-  - callbacks:
-    - train_proj_only
-
-  - extras:
-    - misc
-    - low_resource
-
+  - callbacks: [train_proj_only]
+  - debug: null
+  - extras: low_resource_mode
   - _self_
+
+  # Overrides
+  - override experiment/net/decoder: random_llama
 
 
 paths:

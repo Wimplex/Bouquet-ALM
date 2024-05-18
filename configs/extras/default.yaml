@@ -1,4 +1,7 @@
 # @package _global_
 
+# ignore python warnings
 filter_warnings: true
+
+# print out final config
 print_config: true
